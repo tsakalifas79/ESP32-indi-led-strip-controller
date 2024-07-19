@@ -1,52 +1,40 @@
-/*
- * SPDX-FileCopyrightText: 2010-2022 Espressif Systems (Shanghai) CO LTD
- *
- * SPDX-License-Identifier: CC0-1.0
- */
-
 #include <stdio.h>
-#include <inttypes.h>
-#include "sdkconfig.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "esp_chip_info.h"
-#include "esp_flash.h"
-#include "esp_system.h"
+#include "esp_log.h"
 
-void app_main(void)
-{
-    printf("Hello world!\n");
+static const char *TAG = "example";
 
-    /* Print chip information */
-    esp_chip_info_t chip_info;
-    uint32_t flash_size;
-    esp_chip_info(&chip_info);
-    printf("This is %s chip with %d CPU core(s), %s%s%s%s, ",
-           CONFIG_IDF_TARGET,
-           chip_info.cores,
-           (chip_info.features & CHIP_FEATURE_WIFI_BGN) ? "WiFi/" : "",
-           (chip_info.features & CHIP_FEATURE_BT) ? "BT" : "",
-           (chip_info.features & CHIP_FEATURE_BLE) ? "BLE" : "",
-           (chip_info.features & CHIP_FEATURE_IEEE802154) ? ", 802.15.4 (Zigbee/Thread)" : "");
+#define BLINK_GPIO 0
 
-    unsigned major_rev = chip_info.revision / 100;
-    unsigned minor_rev = chip_info.revision % 100;
-    printf("silicon revision v%d.%d, ", major_rev, minor_rev);
-    if(esp_flash_get_size(NULL, &flash_size) != ESP_OK) {
-        printf("Get flash size failed");
-        return;
-    }
+led_strip_handle_t led_strip;
 
-    printf("%" PRIu32 "MB %s flash\n", flash_size / (uint32_t)(1024 * 1024),
-           (chip_info.features & CHIP_FEATURE_EMB_FLASH) ? "embedded" : "external");
+/* LED strip initialization with the GPIO and pixels number*/
+led_strip_config_t strip_config = {
+    .strip_gpio_num = BLINK_GPIO, // The GPIO that connected to the LED strip's data line
+    .max_leds = 1, // The number of LEDs in the strip,
+    .led_pixel_format = LED_PIXEL_FORMAT_GRB, // Pixel format of your LED strip
+    .led_model = LED_MODEL_WS2812, // LED strip model
+    .flags.invert_out = false, // whether to invert the output signal (useful when your hardware has a level inverter)
+};
 
-    printf("Minimum free heap size: %" PRIu32 " bytes\n", esp_get_minimum_free_heap_size());
+led_strip_rmt_config_t rmt_config = {
+#if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
+    .rmt_channel = 0,
+#else
+    .clk_src = RMT_CLK_SRC_DEFAULT, // different clock source can lead to different power consumption
+    .resolution_hz = 10 * 1000 * 1000, // 10MHz
+    .flags.with_dma = false, // whether to enable the DMA feature
+#endif
+};
+ESP_ERROR_CHECK(led_strip_new_rmt_device(&strip_config, &rmt_config, &led_strip));
 
-    for (int i = 10; i >= 0; i--) {
-        printf("Restarting in %d seconds...\n", i);
+
+void app_main(void) {
+    while (1) {
+        ESP_LOGI(TAG, "Turning the LED strip %s!", led_state_off == true ? "ON" : "OFF");
+
+        led_state_off = !led_state_off;
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
-    printf("Restarting now.\n");
-    fflush(stdout);
-    esp_restart();
-}
+} 
