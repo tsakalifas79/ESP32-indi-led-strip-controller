@@ -3,6 +3,12 @@
 #include "freertos/task.h"
 #include "esp_log.h"
 
+include/led_strip.h
+include/led_strip_rmt.h
+include/led_strip_spi.h
+include/led_strip_types.h
+interface/led_strip_interface.h
+
 static const char *TAG = "example";
 
 #define BLINK_GPIO 0
