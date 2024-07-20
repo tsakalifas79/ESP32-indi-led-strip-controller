@@ -1,5 +1,22 @@
 #include "strip_handler.h"
 
+static const char *TAG = "strip_handler";
+
+led_strip_handle_t led_strip;
+
+uint8_t pixels[LED_STRIP_LED_NUMBERS][COLORS];
+uint8_t color[COLORS];
+
+uint8_t max_intensity = 30;
+uint8_t speed = 0;
+uint8_t update = 0;
+
+uint8_t r_mod = 1;
+uint8_t g_mod = 2;
+uint8_t b_mod = 3;
+uint8_t w_mod = 4;
+
+
 
 led_strip_handle_t configure_led(void)
 {

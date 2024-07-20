@@ -1,8 +1,7 @@
 
-#include "../components/strip_handler/include/strip_handler.h"
+#include "strip_handler.h"
 
-static const char *TAG = "example";
-
+static const char *TAG = "main";
 
 void app_main(void)
 {
