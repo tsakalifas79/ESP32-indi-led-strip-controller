@@ -11,22 +11,6 @@ from pytest_embedded_qemu.app import QemuApp
 from pytest_embedded_qemu.dut import QemuDut
 
 
-@pytest.mark.supported_targets
-@pytest.mark.preview_targets
-@pytest.mark.generic
-def test_hello_world(
-    dut: IdfDut, log_minimum_free_heap_size: Callable[..., None]
-) -> None:
-    dut.expect('Hello world!')
-    log_minimum_free_heap_size()
-
-
-@pytest.mark.linux
-@pytest.mark.host_test
-def test_hello_world_linux(dut: IdfDut) -> None:
-    dut.expect('Hello world!')
-
-
 def verify_elf_sha256_embedding(app: QemuApp, sha256_reported: str) -> None:
     sha256 = hashlib.sha256()
     with open(app.elf_file, 'rb') as f:
@@ -50,4 +34,4 @@ def test_hello_world_host(app: QemuApp, dut: QemuDut) -> None:
     )
     verify_elf_sha256_embedding(app, sha256_reported)
 
-    dut.expect('Hello world!')
+    dut.expect('Start LED strip')
