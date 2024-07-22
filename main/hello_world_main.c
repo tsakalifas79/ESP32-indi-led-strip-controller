@@ -1,10 +1,19 @@
 
 #include "strip_handler.h"
+#include "wifi_connection_handler.h"
+#include "nvs_flash.h" //non volatile storage
+
+
+
 
 static const char *TAG = "main";
 
+
 void app_main(void)
 {
+
+    nvs_flash_init();
+    wifi_connect();
     strip_setup();
     bool led_on_off = true;
 
@@ -24,3 +33,4 @@ void app_main(void)
         vTaskDelay(pdMS_TO_TICKS(30));
     }
 }
+
