@@ -6,14 +6,7 @@
 #include "strip_handler.h"
 #include "wifi_connection_handler.h"
 
-
-
-
-
 static const char *TAG = "main";
-
-
-
 
 void app_main(void){
     ESP_LOGI(TAG, "flashing the non volatile storage");
