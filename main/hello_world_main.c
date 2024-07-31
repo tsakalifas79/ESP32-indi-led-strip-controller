@@ -23,10 +23,10 @@ void app_main(void){
     ESP_LOGI(TAG, "starting mdns");
     start_mdns_service();
     ESP_LOGI(TAG, "starting http server");
-    start_http_server();
+    bool led_on_off = true;
+    start_http_server(&led_on_off);
     ESP_LOGI(TAG, "setting up the led strip");
     strip_setup();
-    bool led_on_off = true;
 
     ESP_LOGI(TAG, "Start applying logic on the LED strip");
     while (1)
