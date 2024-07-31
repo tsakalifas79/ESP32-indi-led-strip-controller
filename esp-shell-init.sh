@@ -1,3 +1,3 @@
-cd /opt/esp/esp-idf
+cd ~/esp/esp-idf
 . ./export.sh
 cd ~/projects/ESP32-indi-led-strip-controller
