@@ -34,4 +34,4 @@ def test_hello_world_host(app: QemuApp, dut: QemuDut) -> None:
     )
     verify_elf_sha256_embedding(app, sha256_reported)
 
-    dut.expect('Start LED strip')
+    dut.expect('connecting to wifi')
