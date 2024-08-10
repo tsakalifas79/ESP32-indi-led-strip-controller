@@ -34,6 +34,5 @@ void app_main(void){
             ESP_ERROR_CHECK(led_strip_clear(led_strip));
             ESP_LOGI(TAG, "LED OFF!");
         }
-        vTaskDelay(pdMS_TO_TICKS(30));
     }
 }
