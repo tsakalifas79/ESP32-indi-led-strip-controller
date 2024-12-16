@@ -1,4 +1,5 @@
 #include "strip_handler.h"
+#include "esp_random.h"
 
 static const char *TAG = "strip_handler";
 
@@ -6,6 +7,7 @@ led_strip_handle_t led_strip;
 
 uint8_t pixels[LED_STRIP_LED_NUMBERS][COLORS];
 uint8_t color[COLORS];
+uint8_t black[COLORS]={0,0,0};
 
 uint8_t max_intensity = 30;
 uint8_t speed = 0;
@@ -24,8 +26,8 @@ led_strip_handle_t configure_led(void)
     led_strip_config_t strip_config = {
         .strip_gpio_num = LED_STRIP_BLINK_GPIO,    // The GPIO that connected to the LED strip's data line
         .max_leds = LED_STRIP_LED_NUMBERS,         // The number of LEDs in the strip,
-        .led_pixel_format = LED_PIXEL_FORMAT_GRBW, // Pixel format of your LED strip
-        .led_model = LED_MODEL_SK6812,             // LED strip model
+        .led_pixel_format = LED_PIXEL_FORMAT_GRB, // Pixel format of your LED strip
+        .led_model = LED_MODEL_WS2812,             // LED strip model
         .flags.invert_out = false,                 // whether to invert the output signal
     };
 
@@ -49,10 +51,19 @@ led_strip_handle_t configure_led(void)
 
 void motion()
 {
-        color[0] = (r_mod + color[0]) % max_intensity;
-        color[1] = (g_mod + color[1]) % max_intensity;
-        color[2] = (b_mod + color[2]) % max_intensity;
-        color[3] = (w_mod + color[3]) % max_intensity;
+        // color[0] = (r_mod + color[0]) % max_intensity;
+        // color[1] = (g_mod + color[1]) % max_intensity;
+        // color[2] = (b_mod + color[2]) % max_intensity;
+        // color[3] = (w_mod + color[3]) % max_intensity;
+
+        color[0] = (255) % max_intensity;
+        color[1] = (0) % max_intensity;
+        color[2] = (100) % max_intensity;
+
+        // color[0] = (esp_random()) % max_intensity;
+        // color[1] = (esp_random()) % max_intensity;
+        // color[2] = (esp_random()) % max_intensity;
+
 }
 
 void fade_out(int i)
@@ -67,6 +78,8 @@ void fade_out(int i)
 }
 
 
+
+
 void update_map()
 {
     update = (update + 1) % LED_STRIP_LED_NUMBERS;
@@ -75,19 +88,28 @@ void update_map()
     for (int i = 0; i < LED_STRIP_LED_NUMBERS; i++)
     {
         // fade_out(i);
-        if(i == update){
             motion();
             for (size_t j = 0; j < COLORS; j++)
             {  
                 pixels[i][j] = color[j];
             }
+
+        if(i == update){
+            for (size_t j = 0; j < COLORS; j++)
+            {  
+            pixels[i][j] = black[j];
+            }
         }
 
-        ESP_ERROR_CHECK(led_strip_set_pixel_rgbw(led_strip, i, pixels[i][0], pixels[i][1], pixels[i][2], pixels[i][3]));
+        ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, i, pixels[i][0], pixels[i][1], pixels[i][2]));
+
     }
+
+    vTaskDelay(pdMS_TO_TICKS(100));
 
     /* Refresh the strip to send data */
     ESP_ERROR_CHECK(led_strip_refresh(led_strip));
+
 }
 
 
